@@ -1,6 +1,5 @@
 package com.me.youtree.exception;
 
-import com.me.youtree.controller.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

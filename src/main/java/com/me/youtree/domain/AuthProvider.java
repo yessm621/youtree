@@ -1,6 +1,5 @@
 package com.me.youtree.domain;
 
-public enum SocialType {
-
+public enum AuthProvider {
     GOOGLE, KAKAO, NAVER
 }

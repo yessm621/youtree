@@ -2,7 +2,6 @@ package com.me.youtree.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "USERS")
@@ -33,15 +32,10 @@ public class User extends BaseEntity {
     private UserRole role = UserRole.USER;
 
     @Enumerated(EnumType.STRING)
-    private SocialType socialType;
-    private String socialId;
+    private AuthProvider authProvider;
+    private String oauth2Id;
 
     private String refreshToken;
-
-    // 비밀번호 암호화 메소드
-    public void passwordEncode(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
-    }
 
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;

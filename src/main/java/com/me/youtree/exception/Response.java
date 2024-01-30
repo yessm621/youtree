@@ -1,4 +1,4 @@
-package com.me.youtree.controller.response;
+package com.me.youtree.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
