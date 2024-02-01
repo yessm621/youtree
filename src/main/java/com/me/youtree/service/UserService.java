@@ -2,15 +2,14 @@ package com.me.youtree.service;
 
 import com.me.youtree.domain.User;
 import com.me.youtree.domain.UserRole;
-import com.me.youtree.dto.TokenDto;
 import com.me.youtree.dto.UserDto;
 import com.me.youtree.exception.ErrorCode;
 import com.me.youtree.exception.YouTreeApplicationException;
 import com.me.youtree.jwt.JwtTokenProvider;
 import com.me.youtree.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,7 @@ public class UserService {
     @Transactional
     public void register(UserDto dto) {
         validateDuplicated(dto.email());
-        User user = userRepository.save(
+        userRepository.save(
                 User.builder()
                         .email(dto.email())
                         .password(passwordEncoder.encode(dto.password()))
@@ -42,39 +41,18 @@ public class UserService {
     }
 
     @Transactional
-    public TokenDto login(UserDto dto) {
-        User user = userRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new YouTreeApplicationException(ErrorCode.USER_NOT_FOUND));
-        if (!passwordEncoder.matches(dto.password(), user.getPassword()))
-            throw new YouTreeApplicationException(ErrorCode.INVALID_PASSWORD);
+    public void reIssue(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = jwtTokenProvider.extractRefreshToken(request)
+                .orElseThrow(() -> new YouTreeApplicationException(ErrorCode.INVALID_TOKEN, "RefreshToken을 찾을 수 없습니다."));
+        if (!jwtTokenProvider.validateTokenExpiration(refreshToken)) {
+            throw new YouTreeApplicationException(ErrorCode.INVALID_TOKEN, "유효하지 않은 RefreshToken 입니다. 다시 로그인 해주세요.");
+        }
 
-        user.updateRefreshToken(jwtTokenProvider.createRefreshToken());
+        User user = userRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new YouTreeApplicationException(ErrorCode.INVALID_TOKEN, "RefreshToken을 찾을 수 없습니다."));
 
-        return new TokenDto(jwtTokenProvider.createToken(dto.email()), user.getRefreshToken());
-    }
+        String newRefreshToken = jwtTokenProvider.reIssue(response, user.getEmail());
 
-    @Transactional
-    public TokenDto reIssue(TokenDto dto) {
-        if (!jwtTokenProvider.validateTokenExpiration(dto.refreshToken()))
-            throw new YouTreeApplicationException(ErrorCode.INVALID_TOKEN);
-
-        User user = findUserByToken(dto);
-
-        if (!user.getRefreshToken().equals(dto.refreshToken()))
-            throw new YouTreeApplicationException(ErrorCode.INVALID_TOKEN);
-
-        String accessToken = jwtTokenProvider.createToken(user.getEmail());
-        String refreshToken = jwtTokenProvider.createRefreshToken();
-        user.updateRefreshToken(refreshToken);
-
-        return new TokenDto(accessToken, refreshToken);
-    }
-
-    public User findUserByToken(TokenDto dto) {
-        Authentication auth = jwtTokenProvider.getAuthentication(dto.accessToken());
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        String username = userDetails.getUsername();
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new YouTreeApplicationException(ErrorCode.USER_NOT_FOUND));
+        user.updateRefreshToken(newRefreshToken);
     }
 }

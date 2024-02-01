@@ -18,7 +18,7 @@ public class User extends BaseEntity {
     private Long id;
 
     @Setter
-    @Column(length = 50, unique = true)
+    @Column(unique = true)
     private String email;
 
     @Setter
@@ -34,6 +34,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider;
     private String oauth2Id;
+    private String socialId;
 
     private String refreshToken;
 
