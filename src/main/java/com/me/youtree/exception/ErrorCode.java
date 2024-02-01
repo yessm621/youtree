@@ -8,15 +8,12 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-    DUPLICATED_USER_NAME(HttpStatus.CONFLICT, "User name is duplicated"),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not founded"),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
-    POST_NOT_FOUNT(HttpStatus.NOT_FOUND, "Post not found"),
-    INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
-    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurs in database"),
-    ALREADY_LIKED(HttpStatus.CONFLICT, "User already liked post")
+    DUPLICATED_USER_NAME(HttpStatus.CONFLICT, "사용자 아이디가 중복됩니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 일치하지 않습니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 일치하지 않습니다."),
+    INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "권한이 유효하지 않습니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러 입니다."),
     ;
 
     private final HttpStatus status;
