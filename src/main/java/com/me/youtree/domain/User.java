@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
+@Builder
 public class User extends BaseEntity {
 
     @Id
@@ -16,14 +17,28 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(length = 50, unique = true)
+    @Setter
+    @Column(unique = true)
     private String email;
+
+    @Setter
+    private String password;
 
     @Column(length = 50)
     private String nickname;
+    private String imageUrl;
 
-    @Column(length = 50)
-    private String method;
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.USER;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
+    private String oauth2Id;
+    private String socialId;
 
     private String refreshToken;
+
+    public void updateRefreshToken(String updateRefreshToken) {
+        this.refreshToken = updateRefreshToken;
+    }
 }
